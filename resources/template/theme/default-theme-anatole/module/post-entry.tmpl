@@ -1,0 +1,53 @@
+{{- define "caicai_anatole/module/post-entry" -}}
+    {{range $key, $post:=.posts.Content}}
+        {{$mod := getMod $key 2 8 -}}
+        {{$rand := GetPicNumStr 66 1 2 -}}
+        {{$defaultImg := PicStrJoinNum "/upload/source_dir/article_bg/" $rand ".jpg" -}}
+        <div class="{{if eq $mod 0}}post-wrap-left{{else}}post-wrap-right{{end}} animated">
+
+            <a class="post-link" href="{{$post.FullPath}}" aria-label="{{$post.Title}}"></a>
+            <div class="postlist-one-cover {{if eq $mod 0}}post-cover-left{{else}}post-cover-right{{end}}">
+                <img data-src="{{if $post.Thumbnail}} {{$post.Thumbnail}} {{else}} {{$defaultImg}}{{end}}" data-sizes="auto"
+                    alt="{{$post.Title}}" class="lazyautosizes ls-is-cached lazyloaded" sizes="358px"
+                    src="{{if $post.Thumbnail}} {{$post.Thumbnail}} {{else}} {{$defaultImg}}{{end}}">
+            </div>
+            <div class="post-info">
+                <div class="post-meta">
+                    <i class="iconify w-3 h-3" data-icon="mdi:calendar-month-outline"></i>
+                    <span>{{unix_milli_time_format "2006-01-02" $post.CreateTime}}</span>
+                    <i class="iconify w-3 h-3" data-icon="mdi:eye"></i>
+                    <span>{{$post.Visits}}</span>
+                    <i class="iconify w-3 h-3" data-icon="mdi:comment-outline"></i>
+                    <span href="{{$post.FullPath}}#comment_widget">{{$post.CommentCount}}</span>
+                    <div class="inline-block hover:text-red-700 cursor-pointer"
+                            x-bind:class="{'text-red-700': liked({{$post.ID}})}"
+                            x-on:click="handleLike({{$post.ID}})">
+                        <i x-show="liked({{$post.ID}})" class="iconify w-3 h-3"
+                            data-icon="mdi:heart"></i>
+                        <i x-show="!liked({{$post.ID}})" class="iconify w-3 h-3"
+                            data-icon="mdi:heart-outline"></i>
+                        <span data-post-id-likes="{{$post.ID}}">{{$post.Likes}}</span>
+                    </div>
+
+                    {{if (gt (len $post.Categories) 0)}}
+                        <i class="iconify w-3 h-3" data-icon="mdi:folder-outline"></i>
+
+                        {{range $category:=$post.Categories}}
+                            <a href="{{$category.FullPath}}" title="{{$category.Name}}">{{$category.Name}}</a>
+                        {{end}}
+                    {{end}}
+
+                    {{if gt (len $post.Tags) 0}}
+                        <i class="iconify w-3 h-3" data-icon="mdi:tag"></i>
+                        {{range $tag:=$post.Tags}}
+                            <a href="{{$tag.FullPath}}" title="{{$tag.Name}}">#{{$tag.Name}}</a>
+                        {{end}}
+                    {{end}}
+                </div>
+                <h2 class="post-title">{{$post.Title}}</h2>
+                <article class="post-article">{{$post.Summary}}...</article>
+            </div>
+
+        </div>
+    {{end}}
+{{end}}

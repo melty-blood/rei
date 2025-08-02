@@ -1,0 +1,50 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive MYSQL_ROOT_PASSWORD=lovelive
+
+RUN apt-get update && \
+    apt-get install -y wget gnupg curl lsb-release gosu ca-certificates vim net-tools sqlite3 libsqlite3-dev sudo supervisor openssh-server unzip && \
+    wget https://dev.mysql.com/get/mysql-apt-config_0.8.29-1_all.deb && \
+    DEBIAN_FRONTEND=noninteractive dpkg -i mysql-apt-config_0.8.29-1_all.deb && \
+    apt-get update && \
+    apt-get install -y mysql-server && \
+    rm -f mysql-apt-config_0.8.29-1_all.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./docker/mysql_sh/supervisord.conf /etc/supervisord.conf
+
+# 创建 mysql 用户与必要目录，设置权限
+RUN mkdir -p /var/lib/mysql /var/run/mysqld && \
+    chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
+    chmod 755 /var/run/mysqld
+
+RUN mkdir -p /home/rei/mysql_shell
+RUN mkdir -p /home/rei/supervisor
+
+COPY ./docker/mysql_sh/entrypoint.sh /home/rei/mysql_shell/entrypoint.sh
+COPY ./docker/mysql_sh/init.sql /home/rei/mysql_shell/init.sql
+COPY ./docker/mysql_sh/init.sql /docker-entrypoint-initdb.d/init.sql
+
+COPY ./docker/mysql_sh/sqlinit /home/rei/mysql_shell/sqlinit
+
+WORKDIR /home/rei
+
+RUN mkdir -p /home/rei/sunny_peace_rei/supervisor
+
+RUN echo $(pwd)
+
+COPY ./conf ./sunny_peace_rei/conf
+COPY ./logs ./sunny_peace_rei/logs
+COPY ./resources ./sunny_peace_rei/resources
+COPY ./rei ./sunny_peace_rei/rei
+COPY ./systemd ./sunny_peace_rei/systemd
+COPY ./upload ./sunny_peace_rei/upload
+
+# 复制 entrypoint 脚本并赋予执行权限
+RUN chmod +x /home/rei/mysql_shell/entrypoint.sh
+
+# 暴露端口与启动脚本
+EXPOSE 3306
+ENTRYPOINT ["/home/rei/mysql_shell/entrypoint.sh"]
+CMD ["gosu", "mysql", "mysqld"]

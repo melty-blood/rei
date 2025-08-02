@@ -1,0 +1,13 @@
+[Unit]
+Description=Go-Sonic Service
+Documentation=https://github.com/go-sonic/sonic
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+ExecStart=/your_path/sonic  -config /your_path/conf/config.yaml
+Restart=on-failure
+RestartPreventExitStatus=23
+
+[Install]
+WantedBy=multi-user.target

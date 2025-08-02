@@ -1,0 +1,31 @@
+{{define "caicai_anatole/module/styles"}}
+    <style>
+    .sidebar {
+        width: {{.settings.sidebar_width}};
+    }
+
+    .page-top {
+        width: calc(100% - {{.settings.sidebar_width}});
+    }
+
+    .content {
+        width: calc(100% - {{.settings.sidebar_width}});
+    }
+
+    {{if .settings.sidebar_background}}
+    .sidebar {
+        background: url("{{noescape .settings.sidebar_background}}") no-repeat center center fixed;
+    }
+    {{end}}
+
+    {{if .settings.body_background}}
+    .body-background {
+        background-image: url("{{noescape .settings.body_background}}");
+    }
+    {{end}}
+
+    </style>
+<link href="{{ .theme_base}}/dist/style.css?version={{ .theme.Version}}" rel="stylesheet">
+<link href="{{ .theme_base}}/dist/diy_style.css?version={{ .theme.Version}}" rel="stylesheet">
+<script type="text/javascript" src="{{ .theme_base}}/dist/main.iife.js?version={{ .theme.Version}}"defer></script>
+{{end}}

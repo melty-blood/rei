@@ -1,0 +1,19 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    MYSQL_ROOT_PASSWORD=lovelive
+
+# 安装依赖并添加 MySQL APT 仓库
+RUN apt-get update && \
+    apt-get install -y wget gnupg curl lsb-release && \
+    wget https://dev.mysql.com/get/mysql-apt-config_0.8.29-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.29-1_all.deb && \
+    apt-get update && \
+    apt-get install -y mysql-server && \
+    rm -f mysql-apt-config_0.8.29-1_all.deb && \
+    apt-get clean
+
+
+USER mysql
+EXPOSE 3306
+CMD ["mysqld"]

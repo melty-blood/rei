@@ -1,0 +1,52 @@
+FROM ubuntu:24.04
+
+# 查看代理
+# systemctl show --property=Environment docker
+
+# docker build \
+#   --build-arg http_proxy=http://127.0.0.1:7890 \
+#   --build-arg https_proxy=http://127.0.0.1:7890 \
+# docker build --build-arg http_proxy=http://192.168.51.198:7890 --build-arg https_proxy=http://192.168.51.198:7890 -t typemoonl/rei:latest .
+# docker build --progress=plain -t typemoonl/rei:latest .
+# CGO_ENABLED=0 GOARCH=amd64 go build -o ./rei -a -ldflags '-extldflags "-static"' main.go
+
+RUN apt-get update && apt-get install -y \
+    bash \
+    procps \
+    grep \
+    vim \
+    curl \
+    iputils-ping \
+    net-tools sqlite3 libsqlite3-dev systemd sudo
+
+RUN useradd -s /bin/bash -d /home/kotori kotori
+WORKDIR /home/kotori
+RUN mkdir /home/kotori/mysql
+WORKDIR /home/kotori/mysql
+COPY ./mysql.tar ./mysql.tar
+
+RUN tar -xf mysql.tar
+RUN rm mysql.tar
+RUN apt-get install -y ./mysql-*.deb
+RUN echo $(pwd)
+RUN echo $(ls -lh)
+RUN rm ./*.deb -f
+
+WORKDIR /home/rei
+
+RUN echo $(pwd)
+
+COPY ./conf ./conf
+COPY ./logs ./logs
+COPY ./resources ./resources
+COPY ./rei ./rei
+COPY ./systemd ./systemd
+COPY ./upload ./upload
+
+
+# 设置执行权限（通常不需要，但保险起见）
+RUN chmod +x /home/rei/rei
+
+# 设置启动命令
+CMD ["./rei", "-config", "conf/config.yaml"]
+

@@ -1,0 +1,13 @@
+[Unit]
+Description=rei-go Service
+Documentation=Idoly Pride => rei ichinose
+After=network.target nss-lookup.target
+
+[Service]
+User=nobody
+ExecStart=/home/rei/rei -config /home/rei/conf/config.yaml
+Restart=on-failure
+RestartPreventExitStatus=23
+
+[Install]
+WantedBy=multi-user.target

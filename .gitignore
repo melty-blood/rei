@@ -1,0 +1,8 @@
+logs
+conf/config.yaml
+sonic.db
+upload/**
+!upload/*_dir/
+!upload/*_dir/**
+idolypride*
+**/.directory

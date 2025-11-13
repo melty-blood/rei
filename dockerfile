@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     vim \
     curl \
     iputils-ping \
-    net-tools sqlite3 libsqlite3-dev systemd sudo supervisor openssh-server unzip
+    net-tools sqlite3 libsqlite3-dev systemd sudo supervisor openssh-server unzip bc rsync
 
 COPY ./docker/sqlite_sh/supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /home/rei/supervisor

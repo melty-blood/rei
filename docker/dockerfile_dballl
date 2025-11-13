@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive MYSQL_ROOT_PASSWORD=lovelive
 
 RUN apt-get update && \
-    apt-get install -y wget gnupg curl lsb-release gosu ca-certificates vim net-tools sqlite3 libsqlite3-dev sudo supervisor openssh-server unzip && \
+    apt-get install -y wget gnupg curl lsb-release gosu ca-certificates vim net-tools sqlite3 libsqlite3-dev sudo supervisor openssh-server unzip bc rsync && \
     wget https://dev.mysql.com/get/mysql-apt-config_0.8.29-1_all.deb && \
     DEBIAN_FRONTEND=noninteractive dpkg -i mysql-apt-config_0.8.29-1_all.deb && \
     apt-get update && \
@@ -13,6 +13,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./docker/mysql_sh/supervisord.conf /etc/supervisord.conf
+RUN mkdir -p /home/rei/supervisor
+
+COPY ./docker/etc_conf/sshd_config /etc/ssh/sshd_config
+RUN mkdir /run/sshd
+
+RUN useradd -s /bin/bash -d /home/kotori kotori
+WORKDIR /home/kotori
+RUN echo "kotori:ichinoserei" | chpasswd
+COPY ./docker/etc_conf/sudoers /etc/sudoers
+RUN chmod u=r,g=r,o= /etc/sudoers
 
 # 创建 mysql 用户与必要目录，设置权限
 RUN mkdir -p /var/lib/mysql /var/run/mysqld && \
@@ -40,6 +50,9 @@ COPY ./resources ./sunny_peace_rei/resources
 COPY ./rei ./sunny_peace_rei/rei
 COPY ./systemd ./sunny_peace_rei/systemd
 COPY ./upload ./sunny_peace_rei/upload
+
+RUN chmod +x /home/rei/sunny_peace_rei/rei
+RUN chown -R kotori:kotori /home/rei /home/kotori
 
 # 复制 entrypoint 脚本并赋予执行权限
 RUN chmod +x /home/rei/mysql_shell/entrypoint.sh

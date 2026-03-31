@@ -24,6 +24,17 @@ else
     echo "Update template not has!"
 fi
 
+if [ -f "./admin.tar.gz" ]; then
+    echo "update admin has! Now update."
+
+    echo "back admin dir" /home/rei/update_back/$(date +%Y%m%d)/
+    cp -r /home/rei/sunny_peace_rei/resources/admin /home/rei/update_back/$(date +%Y%m%d)/
+    tar -zxf admin.tar.gz -C /home/rei/sunny_peace_rei/resources/
+    echo "Update admin done!"
+else
+    echo "Update admin not has!"
+fi
+
 echo "update progam ------"
 if [ -f "./rei" ]; then
     echo "update file 'rei' has! Now update progam"
